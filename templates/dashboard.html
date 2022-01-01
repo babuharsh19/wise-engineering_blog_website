@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- Main css -->
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/video.css') }}">
+</head>
+<!--div class="masthead" style="background-image: url('{{ url_for('static',filename='assets/img/signup-bg.jpg') }}')"-->
+<body>
+        <video autoplay muted loop id="myVideo">
+            <source src="{{ url_for('static',filename='assets/img/dashboard.mp4') }}" type="video/mp4">
+          </video>
+          
+
+            <!--img src="{{url_for('static',filename='assets/img/signup-bg.jpg')}}" alt=""--> 
+            <div class="container">
+                    <div class="content">
+                            <div class="d-lg-flex align-items-center justify-content-between">
+                              <div class="d-flex align-items-center">
+                                  <h1>
+                                <span class="badge badge-dark mr-3">Recent Blogs</span>
+                                </h1>
+                                <p class="mb-0">
+                                  <div class="alert alert-success" role="alert">
+                                    <marquee width="100%" direction="left" height="100px" scrollamount="8">
+                                        <h2 style="text-align: center;>
+                                          {% for post in posts %}
+                                          <a href="/post/{{post.slug}}"> {{post.title}} : {{post.subheading}}</a>&emsp;&emsp;&emsp;&emsp;
+                                            {%endfor%} 
+                                        </h2>
+                                    </marquee>
+                                </div>
+                                </p>
+                              </div>
+                        <h1>Click Below! If You Are Admin </h1>
+                        <a href="/adminlogin">
+                            <button style="height:30px;width:120px;background-color:red; border-color:blue; color:white">Click Here</button>
+                         </a>
+                         <h1>Click Below! If You Are User </h1>
+                         <a href="/userlogin">
+                            <button style="height:30px;width:120px; background-color:red; border-color:blue; color:white">Login</button>
+                         </a>
+                        <a href="/register">
+                            <button style="height:30px;width:120px; background-color:red; border-color:blue; color:white">Register</button>
+                         </a>
+                      </div>
+                      </div>
+            </div>
+</div>
+</body>
+</html>

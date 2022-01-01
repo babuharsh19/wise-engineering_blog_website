@@ -1,0 +1,16 @@
+{
+    "parameters":
+    {
+      "local_server":"True",
+      "local_uri":"mysql+pymysql://root:@localhost/wise_engineering",
+      "prod_uri":"mysql+pymysql://root:@localhost/wise_engineering",
+      "fb_url":"https://facebook.com/wise_engineering",
+      "tw_url":"https://twitter.com/wise_engineering",
+      "gh_url":"https://github.com/wise_engineering",
+      "blog_name":"wise engineers",
+      "tag_line":"take steps wisely",
+      "gmail_id":"babuharsh19@gmail.com",
+      "gmail_password":"6387264889"
+
+    }
+}
