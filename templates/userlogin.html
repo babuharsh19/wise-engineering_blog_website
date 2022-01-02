@@ -16,7 +16,7 @@
             <!--img src="{{url_for('static',filename='assets/img/signup-bg.jpg')}}" alt=""--> 
             <div class="container">
                 <div class="signup-content">
-                    <form action="action_page.php" method="post">
+                    <form action="/home" method="post">
                         <div class="container">
                           <label for="uname"><b>Username</b></label>
                           <input type="text" placeholder="Enter Username" name="uname" required>
@@ -33,6 +33,15 @@
                             <br>
                             <button type="button" class="cancelbtn">Cancel</button>
                             <br>
+                            {% with messages = get_flashed_messages() %}
+                            {% if messages %}
+                                <ul class=flashes>
+                                {% for message in messages %}
+                                <li>{{ message }}</li>
+                                {% endfor %}
+                                </ul>
+                            {% endif %}
+                            {% endwith %}
                             <br>
                             <span class="psw">Forgot <a href="#">password?</a></span>
                         </div>

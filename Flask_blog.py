@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request,url_for,Blueprint,flash
-from allmodels import Contact,Posts,app,db
+from flask import Flask, render_template, request,url_for,Blueprint,flash,redirect
+from allmodels import Contact,Posts,User,Admin,app,db
 import pymysql
 import json
 from flask_mail import Mail
@@ -64,15 +64,54 @@ def post_fetch(post_slug):
 
 @app.route("/register",methods = ['GET','POST'])
 def register():
+    if(request.method ==  'POST'):
+
+        '''add entry to the database'''
+        name = request.form.get('name')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        if User.query.filter_by(email=email).first():
+            flash('Sorry, This email is already registered!')
+        else:
+            entry = User(name=name,email=email,password=password)
+            db.session.add(entry)
+            db.session.commit()
+            redirect(url_for('login.html'))
     return render_template('register.html',param=parameter)
 
 @app.route("/userlogin",methods = ['GET','POST'])
 def userlogin():
+    if request.method == "POST":
+        email = request.form.get('email')
+        password = request.form.get('password')
+        user = User.query.filter_by(email= email).first()
+        if user.check_password(password) and user is not None:
+            flash("Loggedin succesfully")
+            return redirect(url_for('home'))
+        else:
+            flash("Either you are not registered or your password is incorrect")
     return render_template('userlogin.html',param=parameter)
 
+@app.route("/adminlogin",methods = ['GET','POST'])
+def adminlogin():
+    if request.method == "POST":
+        email = request.form.get('email')
+        password = request.form.get('password')
+        admin = Admin.query.filter_by(email= email).first()
+        if admin.check_password(password) and admin is not None:
+            flash("Loggedin succesfully")
+            return redirect(url_for('home'))
+        else:
+            flash("Either you are not Admin or your password is incorrect")
+    return render_template('adminlogin.html',param=parameter)
+
 @app.route("/logout",methods = ['GET','POST'])
+@login_required
 def logout():
-    return render_template('logout.html',param=parameter)
+    logout_user()
+    flash('You logged out!')
+    return redirect(url_for('dashboard'))
+
 
 @app.route("/dashboard",methods = ['GET','POST'])
 def dashboard():

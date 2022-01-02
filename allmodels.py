@@ -74,3 +74,19 @@ class User(db.Model,UserMixin):
         check_password_hash(self.password_hash,password)
     def __repr__(self,name):
         return '<name>{}'.format(self.name)
+
+class Admin(db.Model,UserMixin):
+
+    email = db.Column(db.String(200), nullable=False,primary_key=True)  
+    password = db.Column(db.String(20), nullable=False)
+
+    def __init__(self,email,password):
+            email=self.email
+            password=self.password
+            password_hash = self.generate_password_hash(password)
+
+    def check_password(self,password):
+            check_password_hash(self.password_hash,password)
+
+    def __repr__(self,email):
+            return '<email>{}'.format(self.email)
