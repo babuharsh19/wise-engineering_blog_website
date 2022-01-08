@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+{% block body %}
+        <!-- Page Header-->
+        <header class="masthead" style="background-image: url({{url_for('static',filename='assets/img/contact-bg.jpg')}})">
+            <div class="container position-relative px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <div class="page-heading">
+                            <h1>Add Post</h1>
+                            <span class="subheading">Share Your Knowledge and help others!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- Main Content-->
+        <main class="mb-4">
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        
+                        <div class="my-5">
+                            <!-- * * * * * * * * * * * * * * *-->
+                            <!-- * * SB Forms Contact Form * *-->
+                            <!-- * * * * * * * * * * * * * * *-->
+                            <!-- This form is pre-integrated with SB Forms.-->
+                            <!-- To make this form functional, sign up at-->
+                            <!-- https://startbootstrap.com/solution/contact-forms-->
+                            <h3>Upload Img/Any File here!</h3>
+                            <form action="/uploader" method="post" enctype="multipart/form-data">
+                                <input type="file" name="file1">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </form>
+                            <!-- to get an API token!-->
+                            <form id="contactForm" action="/home" method="post" data-sb-form-api-token="API_TOKEN">
+                                <div class="form-floating">
+                                    <input class="form-control" id="title" name="title" type="text" placeholder="Enter Title" data-sb-validations="required"  />
+                                    <label for="name">Title</label>
+                                    <div class="invalid-feedback" data-sb-feedback="name:required">A Title is required.</div>
+                                </div>
+                                <div class="form-floating">
+                                    <input class="form-control" id="subheading" name="subheading" type="text" placeholder="Enter Subheading" data-sb-validations="required" />
+                                    <label for="name">Subheading</label>
+                                    <div class="invalid-feedback" data-sb-feedback="name:required">A Subheading is required.</div>
+                                </div>
+                                <div class="form-floating">
+                                    <input class="form-control" id="slug" name="slug" type="text" placeholder="Enter Slug" data-sb-validations="required" />
+                                    <label for="name">Post Slug</label>
+                                    <div class="invalid-feedback" data-sb-feedback="name:required">A Slug is required.</div>
+                                </div>
+                                <div class="form-floating">
+                                    <input class="form-control" id="content" name="content" type="text" placeholder="Enter Content" data-sb-validations="required"  />
+                                    <label for="name">Content</label>
+                                    <div class="invalid-feedback" data-sb-feedback="name:required">A Content is required.</div>
+                                </div>
+                                <div class="form-floating">
+                                    <input class="form-control" id="img_file" name="img_file" type="text" placeholder="Enter Image file" data-sb-validations="required" />
+                                    <label for="name">Image file Name</label>
+                                    <div class="invalid-feedback" data-sb-feedback="name:required">A Image file name is required.</div>
+                                </div>
+                                
+                                <br />
+                                <!-- Submit success message-->
+                                <!---->
+                                <!-- This is what your users will see when the form-->
+                                <!-- has successfully submitted-->
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary" id="sendMessageButton">Send</button>
+                                  </div>
+                                <div class="d-none" id="submitSuccessMessage">
+                                    <div class="text-center mb-3">
+                                        <div class="fw-bolder">Form submission successful!</div>
+                                        To activate this form, sign up at
+                                        <br />
+                                        <a href="https://startbootstrap.com/solution/contact-forms">https://startbootstrap.com/solution/contact-forms</a>
+                                    </div>
+                                </div>
+                                <!-- Submit error message-->
+                                <!---->
+                                <!-- This is what your users will see when there is-->
+                                <!-- an error submitting the form-->
+                                <div class="d-none" id="submitErrorMessage"><div class="text-center text-danger mb-3">Error sending message!</div></div>
+                                <!-- Submit Button-->
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+{% endblock %}

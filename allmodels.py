@@ -6,19 +6,25 @@ from flask_login import UserMixin
 from sqlalchemy.ext.declarative import declarative_base
 from werkzeug.security import generate_password_hash,check_password_hash
 from sqlalchemy.ext.declarative import declarative_base
+import json
 
+with open('config.json','r') as f:
+    parameter = json.load(f)["parameters"]
 
+local_server = True
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+if(local_server):
+    app.config['SQLALCHEMY_DATABASE_URI'] = parameter['local_uri']
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = parameter['prod_uri']
 
+app.config['SECRET_KEY'] = 'mysecretkey'
 db = SQLAlchemy(app)
 Migrate(app,db)
 Base = declarative_base()
 
-@loginmanager.user_loader
-def load_user(user_id):
-    return User.query.get(user_id)
     
-class Contact(db.Model):
+class Contacts(db.Model):
 
     '''sno, name, email, phone num, message, date'''
 
@@ -28,17 +34,16 @@ class Contact(db.Model):
     phone_no = db.Column(db.String(12), nullable=False)
     message = db.Column(db.String(120), nullable=False)
     
-    def __init__(self,sno,name,email):
-        sno = self.sno
-        name=self.name
-        email=self.email
+    # def __init__(self,name,email,phone_no,message):
+    #     name=self.name
+    #     email=self.email
+    #     phone_no=self.phone_no
+    #     message = self.message
 
     def __repr__(self):
         return '<name>{}'.format(self.name)
 
-class Posts(db.Model):
-
-    '''sno, name, email, phone num, message, date'''
+class Post(db.Model):
 
     sno = db.Column(db.Integer, primary_key=True, nullable=False)
     title = db.Column(db.String(80), nullable=False)
@@ -55,7 +60,7 @@ class Posts(db.Model):
     def __repr__(self):
         return '<sno>{},<title>{}'.format(self.sno,self.title)
 
-class User(db.Model,UserMixin):
+class Users(db.Model,UserMixin):
 
     '''sno, name, email, phone num, message, date'''
 
@@ -63,15 +68,16 @@ class User(db.Model,UserMixin):
     name = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(200), nullable=False)  
     password = db.Column(db.String(20), nullable=False)
+    #password_hash = db.Column(db.String(20), nullable=False)
 
     def __init__(self,user_id,name,email,password):
         user_id=self.user_id
         name=self.name
         email=self.email
         password=self.password
-        password_hash = self.generate_password_hash(password)
-    def check_password(self,password):
-        check_password_hash(self.password_hash,password)
+        
+    # def check_password(self,password):
+    #     check_password_hash(self.password_hash,password)
     def __repr__(self,name):
         return '<name>{}'.format(self.name)
 
@@ -83,10 +89,15 @@ class Admin(db.Model,UserMixin):
     def __init__(self,email,password):
             email=self.email
             password=self.password
-            password_hash = self.generate_password_hash(password)
+            #password_hash = self.generate_password_hash(password)
 
     def check_password(self,password):
             check_password_hash(self.password_hash,password)
 
     def __repr__(self,email):
             return '<email>{}'.format(self.email)
+
+
+@loginmanager.user_loader
+def load_user(user_id):
+    return Users.query.get(user_id)

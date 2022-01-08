@@ -37,7 +37,12 @@
                     <!-- Divider-->
                     <hr class="my-4" />
                     <!-- Pager-->
-                    <div class="d-flex justify-content-end mb-4"><a class="btn btn-primary text-uppercase" href="/post">Older Posts →</a></div>
+                    <div class="clearfix">
+                        <a class="btn btn-primary float-left" href="{{prev}}">&larr; Previous</a>
+                        &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; 
+                        <a class="btn btn-primary float-right" href="{{next}}">Next &rarr;</a>
+                    </div>
+                    
                 </div>
             </div>
         </div>

@@ -1,16 +1,22 @@
 from flask import Flask, render_template, request,url_for,Blueprint,flash,redirect
-from allmodels import Contact,Posts,User,Admin,app,db
+from allmodels import Contacts,Post,Users,Admin,app,db
 import pymysql
 import json
+import datetime
 from flask_mail import Mail
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required,current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+import os
+import math
+from werkzeug.utils import secure_filename
 
-user = Blueprint('core',__name__)
+core = Blueprint('core',__name__)
 
 with open('config.json','r') as f:
     parameter = json.load(f)["parameters"]
 
 local_server = True
+app.config['UPLOAD_FOLDER'] = parameter['upload_location']
 app.config.update(
     MAIL_SERVER ='smtp.gmail.com',
     MAIL_PORT = '465',
@@ -19,17 +25,31 @@ app.config.update(
     MAIL_PASSWORD = parameter['gmail_password']
 )
 mail = Mail(app)
-if(local_server):
-    app.config['SQLALCHEMY_DATABASE_URI'] = parameter['local_uri']
-else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = parameter['prod_uri']
-app.config['SECRET_KEY'] = 'mysecretkey'
+
 
 @app.route("/home")
 @login_required
 def home():
-    posts = Posts.query.filter_by().all()[0:3]
-    return render_template("index.html",param=parameter,posts=posts)
+    posts = Post.query.filter_by().all()
+    last = math.ceil(len(posts)/3)
+    page=request.args.get('page')
+    if (not str(page).isnumeric()):
+        page = 1
+    page = int(page)
+    posts = posts[(page-1)*3:((page-1)*3+ 3)]
+    if page==1:
+        prev = "#"
+        if page==last:
+            next = "#"
+        else:
+            next = "/?page="+ str(page+1)
+    elif page==last:
+        prev = "/?page="+ str(page-1)
+        next = "#"
+    else:
+        prev = "/?page="+ str(page-1)
+        next = "/?page="+ str(page+1)
+    return render_template("index.html",param=parameter,posts=posts,prev=prev,next=next)
 
 @app.route("/about")
 @login_required
@@ -48,7 +68,7 @@ def contact():
         message = request.form.get('message')
 
         '''upload sno, name, email, phone num, message, date on database'''
-        entry = Contact(name=name, email=email, phone_no=phone,message=message)
+        entry = Contacts(name=name, email=email, phone_no=phone,message=message)
         db.session.add(entry)
         db.session.commit()
         mail.send_message('New message from blog ' + str(parameter['blog_name']) + ' by ' + name,
@@ -59,21 +79,23 @@ def contact():
 @app.route("/post/<post_slug>", methods=['GET'] )
 @login_required
 def post_fetch(post_slug):
-    post = Posts.query.filter_by(slug=post_slug).first()
+    post = Post.query.filter_by(slug=post_slug).first()
     return render_template('post.html',param=parameter,post=post)
 
 @app.route("/register",methods = ['GET','POST'])
-def register():
+def registeration():
     if(request.method ==  'POST'):
 
         '''add entry to the database'''
         name = request.form.get('name')
         email = request.form.get('email')
-        password = request.form.get('password')
-        if User.query.filter_by(email=email).first():
+        password = request.form.get('psw')
+        user = Users.query.filter_by(email= email).first()
+        if user:
             flash('Sorry, This email is already registered!')
+            return redirect(url_for('registration'))
         else:
-            entry = User(name=name,email=email,password=password)
+            entry = Users(name=name,email=email,password=generate_password_hash(password, method='sha256'))
             db.session.add(entry)
             db.session.commit()
             redirect(url_for('login.html'))
@@ -81,40 +103,110 @@ def register():
 
 @app.route("/userlogin",methods = ['GET','POST'])
 def userlogin():
-    if request.method == "POST":
+    if request.method == ['GET','POST']:
         email = request.form.get('email')
-        password = request.form.get('password')
-        user = User.query.filter_by(email= email).first()
-        if user.check_password(password) and user is not None:
+        password = request.form.get('psw')
+        remember = True if request.form.get('remember') else False
+        user = Users.query.filter_by(email= email).first()
+        if not user or not check_password_hash(user.password, password):
+            flash("Either you are not registered or your password is incorrect")
+            return redirect(url_for('userlogin'))
+        else:
+            login_user(user, remember=remember)
             flash("Loggedin succesfully")
             return redirect(url_for('home'))
-        else:
-            flash("Either you are not registered or your password is incorrect")
     return render_template('userlogin.html',param=parameter)
 
 @app.route("/adminlogin",methods = ['GET','POST'])
 def adminlogin():
-    if request.method == "POST":
+    if request.method == ['GET','POST']:
         email = request.form.get('email')
         password = request.form.get('password')
         admin = Admin.query.filter_by(email= email).first()
-        if admin.check_password(password) and admin is not None:
+        if admin.password == password and admin is not None:
             flash("Loggedin succesfully")
-            return redirect(url_for('home'))
+            login_user(admin)
+            posts = Post.query.filter_by().all()[0:3]
+            return render_template("admin-login.html",param=parameter,posts=posts)
         else:
             flash("Either you are not Admin or your password is incorrect")
     return render_template('adminlogin.html',param=parameter)
+
+@app.route("/edit/<sno>", methods=['GET','POST'] )
+@login_required
+def edit_post(sno):
+    email=Admin.query.get('email')
+    if(request.method ==  'POST' and current_user.email==email):
+      title = request.form.get('title')
+      subheading = request.form.get('subheading')
+      slug = request.form.get('slug')
+      content = request.form.get('content')
+      img_file = request.form.get('img_file')
+      date=datetime.now()  
+      post = Post.query.filter_by(sno=sno).first()
+      post.title=title
+      post.subheading=subheading
+      post.slug=slug
+      post.content=content
+      post.img_file=img_file
+      post.date=date
+      db.session.commit()
+      return redirect(url_for('admin-panel.html'))
+    post = Post.query.filter_by(sno=sno).first()  
+    return render_template('edit.html',param=parameter,post=post)
+
+@app.route("/add", methods=['GET','POST'] )
+@login_required
+def add_post():
+    if(request.method ==  'POST'):
+      title = request.form.get('title')
+      subheading = request.form.get('subheading')
+      slug = request.form.get('slug')
+      content = request.form.get('content')
+      img_file = request.form.get('img_file')
+      date=datetime.now()  
+      entry = Post(title=title,subheading=subheading,slug=slug,content=content,img_file=img_file,date=date)
+      db.session.add(entry)
+      db.session.commit()
+      return redirect(url_for('/home'))  
+    return render_template('add.html',param=parameter)
+
+@app.route("/uploader" , methods=['GET', 'POST'])
+@login_required
+def uploader():
+        if request.method=='POST':
+            f = request.files['file1']
+            f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(f.filename)))
+            return "Uploaded successfully!"
+
+@app.route("/admin-panel")
+@login_required
+def admin_panel():
+    email=Admin.query.get('email')
+    if current_user.email==email:
+        posts = Post.query.filter_by().all()
+        return render_template('admin-panel.html',param=parameter,posts=posts)
+
+@app.route("/delete/<sno>" , methods=['GET', 'POST'])
+@login_required
+def delete(sno):
+    if current_user.email==Admin.query.get('email'):
+        post = Post.query.filter_by(sno=sno).first()
+        db.session.delete(post)
+        db.session.commit()
+    return redirect(url_for('/home'))
+
 
 @app.route("/logout",methods = ['GET','POST'])
 @login_required
 def logout():
     logout_user()
-    flash('You logged out!')
     return redirect(url_for('dashboard'))
 
 
 @app.route("/dashboard",methods = ['GET','POST'])
 def dashboard():
-    posts = Posts.query.filter_by().all()[0:10]
+    posts = Post.query.filter_by().all()[0:10]
     return render_template('dashboard.html',param=parameter,posts=posts)
+
 app.run(debug = True)
