@@ -153,7 +153,7 @@ def edit_post(sno):
       db.session.commit()
       return redirect(url_for('admin-panel.html'))
     post = Post.query.filter_by(sno=sno).first()  
-    return render_template('edit.html',param=parameter,post=post)
+    return render_template('edit.html',param=parameter,post=post,sno=sno)
 
 @app.route("/add", methods=['GET','POST'] )
 @login_required

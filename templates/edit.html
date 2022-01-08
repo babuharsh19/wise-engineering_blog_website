@@ -33,7 +33,7 @@
                                 <button type="submit" class="btn btn-primary">Submit</button>
                             </form>
                             
-                            <form id="contactForm" action="/edit_post" method="post" data-sb-form-api-token="API_TOKEN">
+                            <form id="contactForm" action="/edit_post/{{sno}}" method="post" data-sb-form-api-token="API_TOKEN">
                                 <div class="form-floating">
                                     <input class="form-control" id="title" name="title" type="text" placeholder="Enter Title" data-sb-validations="required" value="{{post.title}}" />
                                     <label for="name">Title</label>
