@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+{% block body %}
+
+        <!-- Page Header-->
+        <header class="masthead" style="background-image: url('{{ url_for('static',filename='assets/img/home-bg.jpg') }}')">
+            <div class="container position-relative px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <div class="site-heading">
+                            <h1>{{param['blog_name']}}</h1>
+                            <span class="subheading">Tech News Live</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <link
+      rel="stylesheet"
+      href="./static/vendors/mdi/css/materialdesignicons.min.css"
+    />
+    <link rel="stylesheet" href="static/vendors/aos/dist/aos.css/aos.css" />
+
+    
+
+    <!-- inject:css -->
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/news-style.css') }}">
+    <!-- endinject -->
+        </header>
+
+<div class="col-lg-9 stretch-card grid-margin">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          {% for i in case.articles %}
+          <div class="col-sm-4 grid-margin">
+            <div class="position-relative">
+              <div class="rotate-img">
+                <img
+                  src={{i.urlToImage}}
+                  alt="thumb"
+                  class="img-fluid"
+                />
+              </div>
+              <div class="badge-positioned">
+                <span class="badge badge-danger font-weight-bold"
+                  >{{i.author}}</span
+                >
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-8  grid-margin">
+            <h2 class="mb-2 font-weight-600">
+              {{i.title}}
+            </h2>
+            <div class="fs-13 mb-2">
+              <span class="mr-2">Photo </span>{{i.publishedAt}}
+            </div>
+            <p class="mb-0">
+              {{i.description}}
+              <a href={{i.url}}">Read more</a>
+              
+            </p> 
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

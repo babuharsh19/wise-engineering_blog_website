@@ -8,6 +8,7 @@ from flask_login import login_user, logout_user, login_required,current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import math
+import requests
 from werkzeug.utils import secure_filename
 
 core = Blueprint('core',__name__)
@@ -81,6 +82,16 @@ def contact():
 def post_fetch(post_slug):
     post = Post.query.filter_by(slug=post_slug).first()
     return render_template('post.html',param=parameter,post=post)
+
+@app.route('/news',methods=['GET', 'POST'])
+@login_required
+def technews():
+    url = "https://newsapi.org/v2/top-headlines?country=in&category=technology&apiKey=2e30219277054eeab3f13200b9ac3cb1"
+    r = requests.get(url).json()
+    cases = {
+        'articles' : r['articles']
+    }
+    return render_template('tech-news.html',case=cases,param=parameter)
 
 @app.route("/register",methods = ['GET','POST'])
 def registeration():
