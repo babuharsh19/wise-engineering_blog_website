@@ -6,8 +6,8 @@
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-md-10 col-lg-8 col-xl-7">
                         <div class="site-heading">
-                            <h1>{{param['blog_name']}}</h1>
-                            <span class="subheading">{{param['tag_line']}}</span>
+                            <h1 style="color :rgb(34, 3, 170); "> {{param['blog_name']}}</h1>
+                            <span class="subheading" >{{param['tag_line']}}</span>
                         </div>
                     </div>
                 </div>
@@ -22,8 +22,8 @@
                     {% for post in posts %}
                     <div class="post-preview">
                         <a href="/post/{{post.slug}}">
-                            <h2 class="post-title">{{post.title}}</h2>
-                            <h3 class="post-subtitle">{{post.subheading}}</h3>
+                            <h2 class="post-title" >{{post.title}}</h2>
+                            <h3 class="post-subtitle" style="color :red; ">{{post.subheading}}</h3>
                         </a>
                         <p class="post-meta">
                             Posted by
