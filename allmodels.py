@@ -15,8 +15,8 @@ local_server = True
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 if(local_server):
     app.config['SQLALCHEMY_DATABASE_URI'] = parameter['local_uri']
-else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = parameter['prod_uri']
+# else:
+#     app.config['SQLALCHEMY_DATABASE_URI'] = parameter['prod_uri']
 
 app.config['SECRET_KEY'] = 'mysecretkey'
 db = SQLAlchemy(app)
